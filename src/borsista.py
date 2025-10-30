@@ -1,18 +1,16 @@
-# tutor.py
 from dataclasses import dataclass
 
-@dataclass(frozen=True, eq=True)  # Make the class immutable and provide equality comparison
+@dataclass(frozen=True, eq=True)
 class Borsista:
     nome: str
     cognome: str
-    ore_totali: float  # Changed to float since we have decimal values in main.py
+    ore_totali: float
     laureando: bool = False
 
     def __str__(self):
         return f"{self.nome} {self.cognome}"
     
     def __hash__(self):
-        # Create a hash based on the immutable attributes that make each borsista unique
         return hash((self.nome, self.cognome))
     
     def get_ore_con_turni(self, num_turni):

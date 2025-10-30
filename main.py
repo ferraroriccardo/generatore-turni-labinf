@@ -1,7 +1,8 @@
 # main.py
 
-from borsista import Borsista
-from generatore_di_turni_labinf import assegna_turni
+from src.borsista import Borsista
+from src.generatore_di_turni_labinf import assegna_turni
+from src.output import write_output
 
 # ---------------------- DEFINIZIONE PERSONE ----------------------
 digre = Borsista("Matteo", "Di Gregorio", 37, laureando=True)
@@ -36,14 +37,8 @@ MAX_ORE_DIFFERENZA = 30  # massima differenza di ore consentita tra borsisti
 # ---------------------- GENERAZIONE TURNI ----------------------
 turni, conteggi = assegna_turni(dizMattine, dizPomeriggi, max_ore_differenza=MAX_ORE_DIFFERENZA)
 
-# ---------------------- STAMPA RISULTATI ----------------------
-print("\n📅 ASSEGNAZIONE TURNI:")
-for giorno, t in turni.items():
-    mattina = t['mattina']
-    pomeriggio = t['pomeriggio']
-    print(f"{giorno.capitalize()}: mattina = {mattina}, pomeriggio = {pomeriggio}")
-
-print("\n📊 Totale turni per persona:")
-for persona, n_turni in conteggi.items():
-    status = "🎓" if persona.laureando else ""
-    print(f"{persona}: {n_turni} turni {status}")
+# ---------------------- OUTPUT ----------------------
+# Ora tutta la logica di presentazione/salvataggio dell'output è delegata a
+# `output.write_output`. Qui chiamiamo semplicemente la funzione che crea le
+# tabelle (CSV/XLSX quando possibile) e stampa una versione leggibile in console.
+write_output(turni, conteggi, output_dir='output')
