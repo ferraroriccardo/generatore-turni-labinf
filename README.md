@@ -33,7 +33,7 @@ Oltre alla stampa a video, il programma salva il calendario dei turni in formato
 
 - `output/turni.csv` — contiene la tabella dei turni in layout verticale (colonne = giorni; righe = Mattina, Pomeriggio).
 
-Se `pandas` e `openpyxl` sono installati, il programma prova anche a scrivere `output/turni.xlsx`.
+Se `pandas` e `openpyxl` sono installati, il programma prova anche a scrivere `output/turni.xlsx` e l'output su terminale sarà formattato.
 
 ## Metodo di assegnazione delle priorità
 
