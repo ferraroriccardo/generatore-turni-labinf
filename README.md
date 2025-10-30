@@ -27,6 +27,14 @@ python .\main.py
 
 Il programma stamperà i turni generati
 
+### Dove viene salvato l'output
+
+Oltre alla stampa a video, il programma salva il calendario dei turni in formato CSV nella cartella `output/` (creata automaticamente se non esiste). Il file si chiama:
+
+- `output/turni.csv` — contiene la tabella dei turni in layout verticale (colonne = giorni; righe = Mattina, Pomeriggio).
+
+Se `pandas` e `openpyxl` sono installati, il programma prova anche a scrivere `output/turni.xlsx`.
+
 ## Metodo di assegnazione delle priorità
 
 L'algoritmo di assegnazione dei turni segue una logica semplice e prevedibile per garantire equità e rispetto delle disponibilità:
