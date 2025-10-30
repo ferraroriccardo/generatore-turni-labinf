@@ -65,41 +65,7 @@ def assegna_turni(dizMattine, dizPomeriggi, max_turni=2, max_ore_differenza=30):
 
     # Crea lista laureandi
     laureandi = [p for p in tutte_le_persone if p.laureando]
-
-    def get_ore_totali(persona):
-        return persona.get_ore_con_turni(conteggio_turni[persona])
-
-    def get_ore_min_max():
-        """Ritorna il minimo e massimo delle ore totali tra tutte le persone"""
-        if not tutte_le_persone:
-            return 0, 0
-        ore_per_persona = [get_ore_totali(p) for p in tutte_le_persone]
-        return min(ore_per_persona), max(ore_per_persona)
-
-    def check_ore_differenza():
-        """Verifica se la differenza di ore è accettabile"""
-        ore_min, ore_max = get_ore_min_max()
-        return (ore_max - ore_min) <= max_ore_differenza
-
-    def score_secondo_turno(persona):
-        """Calcola il punteggio per l'assegnazione del secondo turno.
-        Punteggio più basso = priorità più alta"""
-        ore_min, _ = get_ore_min_max()
-        ore_persona = get_ore_totali(persona)
-        
-        # Punteggio base basato sulle ore (0 per chi ha ore minime, cresce con la differenza)
-        score = ore_persona - ore_min
-        
-        # Se la differenza ore è maggiore del max, dai priorità assoluta a chi ha meno ore
-        if score > max_ore_differenza:
-            return score
-        
-        # Altrimenti considera prima il fatto di essere laureando
-        if persona.laureando:
-            score -= 1000  # Bonus significativo per i laureandi
-            
-        return score
-
+    
     # Prima fase: assicurati che tutti abbiano almeno un turno
     persone_senza_turni = tutte_le_persone.copy()
     
@@ -115,19 +81,25 @@ def assegna_turni(dizMattine, dizPomeriggi, max_turni=2, max_ore_differenza=30):
             # Prima assegna a chi non ha ancora turni
             disponibili_senza_turni = [p for p in disponibili_mattina if p in persone_senza_turni]
             if disponibili_senza_turni:
-                candidato_mattina = min(disponibili_senza_turni, key=get_ore_totali)
+                candidato_mattina = min(disponibili_senza_turni, key=lambda p: get_ore_totali(p, conteggio_turni))
             else:
                 # Se tutti hanno già un turno, usa i criteri standard
                 sotto_limite = [p for p in disponibili_mattina if conteggio_turni[p] < max_turni]
                 if sotto_limite:
                     # Per il secondo turno, usa il punteggio che considera sia ore che laureando
-                    candidato_mattina = min(sotto_limite, key=lambda p: (
-                        0 if p in persone_senza_turni else score_secondo_turno(p)
-                    ))
+                    candidato_mattina = min(
+                        sotto_limite,
+                        key=lambda p: (
+                            0
+                            if p in persone_senza_turni
+                            else score_secondo_turno(p, laureandi, conteggio_turni, tutte_le_persone, max_ore_differenza)
+                        ),
+                    )
                 else:
-                    candidato_mattina = min(disponibili_mattina, key=lambda p: (
-                        0 if p in persone_senza_turni else get_ore_totali(p)
-                    ))
+                    candidato_mattina = min(
+                        disponibili_mattina,
+                        key=lambda p: (0 if p in persone_senza_turni else get_ore_totali(p, conteggio_turni)),
+                    )
             
             conteggio_turni[candidato_mattina] += 1
             persone_senza_turni.discard(candidato_mattina)  # Rimuovi dalla lista chi ha ottenuto un turno
@@ -138,14 +110,17 @@ def assegna_turni(dizMattine, dizPomeriggi, max_turni=2, max_ore_differenza=30):
             # Prima assegna a chi non ha ancora turni
             disponibili_senza_turni = [p for p in disponibili_pomeriggio if p in persone_senza_turni]
             if disponibili_senza_turni:
-                candidato_pomeriggio = min(disponibili_senza_turni, key=get_ore_totali)
+                candidato_pomeriggio = min(disponibili_senza_turni, key=lambda p: get_ore_totali(p, conteggio_turni))
             else:
                 # Se tutti hanno già un turno, usa i criteri per il secondo turno
                 sotto_limite = [p for p in disponibili_pomeriggio if conteggio_turni[p] < max_turni]
                 if sotto_limite:
-                    candidato_pomeriggio = min(sotto_limite, key=score_secondo_turno)
+                    candidato_pomeriggio = min(
+                        sotto_limite,
+                        key=lambda p: score_secondo_turno(p, laureandi, conteggio_turni, tutte_le_persone, max_ore_differenza),
+                    )
                 else:
-                    candidato_pomeriggio = min(disponibili_pomeriggio, key=get_ore_totali)
+                    candidato_pomeriggio = min(disponibili_pomeriggio, key=lambda p: get_ore_totali(p, conteggio_turni))
             
             conteggio_turni[candidato_pomeriggio] += 1
             persone_senza_turni.discard(candidato_pomeriggio)
@@ -167,9 +142,17 @@ def assegna_turni(dizMattine, dizPomeriggi, max_turni=2, max_ore_differenza=30):
                     # Calcola il punteggio considerando entrambe le persone
                     score = 0
                     if matt:
-                        score += (0 if matt in persone_senza_turni else score_secondo_turno(matt))
+                        score += (
+                            0
+                            if matt in persone_senza_turni
+                            else score_secondo_turno(matt, laureandi, conteggio_turni, tutte_le_persone, max_ore_differenza)
+                        )
                     if pom:
-                        score += (0 if pom in persone_senza_turni else score_secondo_turno(pom))
+                        score += (
+                            0
+                            if pom in persone_senza_turni
+                            else score_secondo_turno(pom, laureandi, conteggio_turni, tutte_le_persone, max_ore_differenza)
+                        )
                     
                     # Penalizza fortemente se lasciamo qualcuno senza turni
                     if matt and matt in persone_senza_turni:

@@ -45,14 +45,12 @@ L'algoritmo di assegnazione dei turni segue una logica semplice e prevedibile pe
 
 2) Chi ha più ore da recuperare
 
-- Dopo la prima assegnazione, si calcola per ogni persona la differenza tra le ore totali previste e le ore già assegnate (deficit di ore).
+- Dopo la prima assegnazione, si calcola per ogni persona la differenza tra il massimo di ore già svolte tra tutti i borsisti e quelle già assegnate ad ogni persona(deficit di ore).
 - Si ordinano le persone in ordine decrescente di deficit (chi ha il deficit maggiore — cioè ha molte ore in meno rispetto al previsto — ha priorità) e si assegnano i turni rimanenti seguendo questo ordine, sempre rispettando le disponibilità.
 
 3) Priorità per i laureandi
 
 - Dopo aver gestito il deficit orario, se rimangono turni non assegnati o in caso di parità/necessità di scelta tra persone con deficit simile, i laureandi (studenti in fase di laurea) vengono considerati con priorità superiore.
-- Se tra più laureandi c'è ancora necessità di scegliere, si può applicare un ulteriore criterio (ad es. chi ha meno turni già assegnati, o ordine alfabetico) — l'implementazione di tie-breaker è opzionale e configurabile.
-
 
 
 ### Esempio (pseudocodice)
